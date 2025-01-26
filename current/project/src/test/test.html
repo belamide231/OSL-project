@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Join</title>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.0.1/dist/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    input {
+      padding: 10px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Join WebSocket</h1>
+  <p>Enter your name and click "Join" to connect to the WebSocket:</p>
+
+  <input type="text" id="userName" placeholder="Enter your name" />
+  <button id="joinButton">Join</button>
+
+  <script>
+    // Connect to WebSocket server
+    const socket = io("http://localhost:3000"); // Replace with your server URL
+
+    document.getElementById("joinButton").addEventListener("click", () => {
+      const userName = document.getElementById("userName").value.trim();
+      if (userName) {
+        // Emit 'join' event with the user name
+        socket.emit("join", { identifier: parseInt(userName), role: 'user' });
+        //console.log(`User "${userName}" has joined.`);
+      } else {
+        alert("Please enter your name.");
+      }
+    });
+
+    // Optional: Listen to server messages (for feedback or events)
+    socket.on("message", (data) => {
+      console.log(data);
+    });
+  </script>
+
+</body>
+</html>
