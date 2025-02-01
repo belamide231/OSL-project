@@ -72,9 +72,7 @@ exports.getActiveClientsService = getActiveClientsService;
 const getConversationsHeadsService = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = (yield app_1.mysql.promise().query('CALL get_conversations_heads(?)', [id]))[0];
-        const custom = result[0].map((v) => [v]);
-        custom[0] = result[1];
-        return { status: 200, result: custom };
+        return { status: 200, result: result };
     }
     catch (error) {
         return { status: 500, result: null };
