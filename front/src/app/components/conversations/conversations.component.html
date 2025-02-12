@@ -47,7 +47,7 @@
             <span class="text-xs text-gray-500">{{ timePassed(chatHead.sent_at) }}</span>
           </div>
 
-          <p class="text-sm text-gray-600 truncate">{{ chatHead.chatmate_id === chatHead.sender_id ? chatHead.chatmate + ': ' + chatHead.content : 'You: ' + chatHead.content }}</p>
+          <p class="text-sm text-gray-600 truncate" [ngClass]="chatHead.chatmate_id === chatHead.sender_id && chatHead.content_status !== 'seen' ? 'font-bold' : '' ">{{ chatHead.chatmate_id === chatHead.sender_id ? chatHead.chatmate + ': ' + chatHead.content : 'You: ' + chatHead.content }}</p>
 
           <!-- <div class="text-xs text-gray-500 mt-2">
             <span *ngIf="message.priority" class="text-red-500 font-semibold">Priority</span>

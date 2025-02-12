@@ -45,11 +45,6 @@ messageController
 })
 
 
-.post('/deliveredChat', isAuthenticated, async (req: Request, res: Response): Promise<any> => {
-    return res.sendStatus(await deliveredChatService((req.user as any).id, req.body as deliveredChatDto));
-})
-
-
-.post('/seenChat', isAuthenticated, async (req: Request, res: Response): Promise<any> => {
-    return res.sendStatus(await seenChatService((req.user as any).id, req.body as seenChatDto));
-})
+// .post('/deliveredChat', isAuthenticated, async (req: Request, res: Response): Promise<any> => {
+//     return res.sendStatus(await deliveredChatService((req.user as any).id, req.body as deliveredChatDto));
+// })

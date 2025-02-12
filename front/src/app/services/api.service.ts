@@ -6,8 +6,6 @@ import { dns } from '../../environment/dns';
 import { loadChatListDto } from '../dto/messages/loadChatListDto';
 import { sendMessageDto } from '../dto/messages/sendMessageDto';
 import { getMessageDto } from '../dto/messages/getMessageDto';
-import { seenChatDto } from '../dto/messages/seenChatDto';
-import { deliveredMessageDto } from '../dto/messages/deliveredMessageDto';
 import { loadConversationDto } from '../dto/messages/loadMessagesDto';
 
 
@@ -30,8 +28,6 @@ export class ApiService {
   loadChatList = (chatListLength: number): Observable<object[] | number> => this.http.post(this.dns('loadChatList'), { chatListLength } as loadChatListDto, this.headers).pipe(map((response: any) => JSON.parse(response.body)), catchError((error) => of(error.status)));
   sendMessage = (receiverId: number, content: string, uuid: string): Observable<any> => this.http.post(this.dns('sendMessage'), { receiverId, content, uuid } as sendMessageDto, this.headers).pipe(map((response: any) => JSON.parse(response.body)), catchError((error: any) => of(error.status)));
   loadMessage = (messageId: number): Observable<any> => this.http.post(this.dns('loadMessage'), { messageId } as getMessageDto, this.headers).pipe(map((response: any) => JSON.parse(response.body)), catchError((error) => of(error.status)));
-  deliveredMessage = (chatmatesId: number[]): Observable<any> => this.http.post(this.dns('deliveredChat'), { chatmatesId } as deliveredMessageDto, this.headers).pipe(map((response) => response.status), catchError((error) => of(error.status)));
-  seenChat = (chatmateId: number): Observable<any> => this.http.post(this.dns('seenChat'), { chatmateId } as seenChatDto, this.headers).pipe(map((response: any) => response.body), catchError((error: any) => of(error.status))); 
   loadMessages = (messageLength: number, chatmateId: number): Observable<any> => this.http.post(this.dns('loadMessages'), { chatmateId, messageLength } as loadConversationDto, this.headers).pipe(map((response: any) => JSON.parse(response.body), catchError((error) => of(error.status))));
 
   // COMPANY 

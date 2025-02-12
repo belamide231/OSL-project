@@ -128,21 +128,14 @@ export const loadMessagesService = async (userId: number, data: getConversationD
 }
 
 
-export const deliveredChatService = async (userId: number, data: deliveredChatDto): Promise<number> => {
+export const deliveredChatService = async (userId: number, chatmatesId: number[]): Promise<number | object> => {
     if(!deliveredChatService)
         return 422;
 
     try {
 
-        const result = (await mysql.promise().query("CALL chat_delivered(?, ?)", [userId, data.chatmatesId.toString()]) as any)[0][0][0];
-
-        let connections: string[] = [];
-        data.chatmatesId.forEach((x) => connections = connections.concat(socketClients.clientConnections[x]));
-        
-        if(connections.length !== 0)
-            io.to(connections).emit('message delivered', { chatmateId: userId, stamp: result.stamp });
-
-        return 200;
+        const result = (await mysql.promise().query("CALL chat_delivered(?, ?)", [userId, chatmatesId.toString()]) as any)[0][0][0];
+        return result;
 
     } catch {
 
@@ -152,21 +145,14 @@ export const deliveredChatService = async (userId: number, data: deliveredChatDt
 }
 
 
-export const seenChatService = async (userId: number, data: seenChatDto): Promise<number> => {
-    if(isNaN(data.chatmateId))
+export const seenChatService = async (userId: number, chatmateId: number): Promise<number> => {
+    if(isNaN(chatmateId))
         return 422;
 
     try {
 
-        const result = (await mysql.promise().query('CALL seen_chat(?, ?)', [userId, data.chatmateId]) as any)[0][0][0];
-
-        result['chatmate_id'] = userId;
-        io.to(socketClients.clientConnections[data.chatmateId]).emit('seen message', result);
-
-        result['chatmate_id'] = data.chatmateId;
-        io.to(socketClients.clientConnections[userId]).emit('seen message', result);
-
-        return 200;
+        const result = (await mysql.promise().query('CALL seen_chat(?, ?)', [userId, chatmateId]) as any)[0][0][0];
+        return result;
 
     } catch {
 

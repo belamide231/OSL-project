@@ -43,7 +43,7 @@ export class SocketService {
         previousChatlist.unshift(updatedChat);
         this._chatList.next(previousChatlist);
 
-        this.api.deliveredMessage([res.chatmate_id]).subscribe(status => status !== 200 && alert('Something went wrong to our connection'));
+        this.messageDelivered([res.chatmate_id]);
       });
     });
 
@@ -65,6 +65,8 @@ export class SocketService {
       this._chatList.next(previousChatList);
 
       const targetMessage = this._chatList.value[this._chatList.value.findIndex(x => x[0].chatmate_id === this.chatmateId)][0];
+      //console.log(targetMessage.content_status);
+      //console.log(targetMessage.chatmate_id !== this.chatmateId);
       if(targetMessage.chatmate_id !== this.chatmateId)
         return
 
@@ -72,7 +74,7 @@ export class SocketService {
       if(seener === targetMessage.sender_id)
         return;
 
-      this.api.seenChat(targetMessage.chatmate_id).subscribe();
+      this.seenChat(targetMessage.chatmate_id);
     });
 
 
@@ -105,12 +107,15 @@ export class SocketService {
   }
 
 
+  public seenChat = (chatmateId: number) => this.socket.emit("seen chat", chatmateId);
+  public messageDelivered = (chatmatesId: number[]) => this.socket.emit("message delivered", chatmatesId);
+
   private loadChatList = () => {
     this.api.loadChatList(this._chatList.value.length).subscribe(async (res: any) => {
       if (isFinite(res)) 
         return alert('Something went wrong with your internet');
-  
-      this.api.deliveredMessage(res.order).subscribe(status => status !== 200 && alert('Something went wrong to our connection'));
+
+      this.messageDelivered(res.order);
       this._chatList.next(res.chatList);
 
       const targetMessage = this._chatList.value[this._chatList.value.findIndex(x => x[0].chatmate_id === this.chatmateId)][0];
@@ -121,7 +126,7 @@ export class SocketService {
       if(seener === targetMessage.sender_id)
         return;
 
-      this.api.seenChat(targetMessage.chatmate_id).subscribe();
+      this.seenChat(targetMessage.chatmate_id);
     });
   }
 }

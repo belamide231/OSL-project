@@ -4,9 +4,3 @@ export interface sendMessageDto {
     receiverId: number;
     uuid: string;
 }
-
-const _ = {
-    "contentType": "string",  
-    "content": "string",      
-    "receiverId": 41          
-}

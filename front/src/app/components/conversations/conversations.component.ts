@@ -88,7 +88,7 @@ export class ConversationComponent implements AfterViewInit {
     if(this.chatList[chatIndex][0].content_status === 'seen')
       return;
 
-    this.api.seenChat(chatmateId).subscribe();
+    this.socket.seenChat(chatmateId);
   }
 
   public renderMessages = () => {
@@ -118,7 +118,6 @@ export class ConversationComponent implements AfterViewInit {
 
       const userId = this.chat[0].chatmate_id !== this.chat[0].sender_id ? this.chat[0].sender_id : this.chat[0].receiver_id;
       this.chat.unshift({ uuid: UUID, content: this.newMessage, status: 'sending', sender_id: userId, receiver_id: this.socket.chatmateId });
-      console.log(this.chat);
 
       this.api.sendMessage(this.socket.chatmateId, this.newMessage, UUID).subscribe(res => {
         if(isFinite(res)) {
