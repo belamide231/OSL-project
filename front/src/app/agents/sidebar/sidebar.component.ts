@@ -52,7 +52,6 @@ export class aSidebarComponent {
     // this.router.navigate(['/login']);
 
     this.api.logout().subscribe(res => res ? alert(res) : this.router.navigate(['/login']));
-    console.log("TAAS");
   }
 
   toggleSidebar(): void {

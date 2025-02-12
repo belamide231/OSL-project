@@ -2,20 +2,30 @@
 module.exports = {
   content: ['./src/**/*.{html,ts}'],
   theme: {
-    extend: {      transitionTimingFunction: {
-      'in-out-custom': 'cubic-bezier(0.4, 0, 0.2, 1)',
+    extend: {
+      animation: {
+        fadeInScale: "fadeInScale .15s ease forwards",
+      },
+      keyframes: {
+        fadeInScale: {
+          "0%": { opacity: "0", transform: "scale(0)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+      },
+      transitionTimingFunction: {
+        'in-out-custom': 'cubic-bezier(0.4, 0, 0.2, 1)',
+      },
+      transitionDuration: {
+        'fast': '150ms',
+        'slow': '500ms',
+      },
+      colors: {
+        primary: 'var(--primary-color)',
+        secondary: 'var(--secondary-color)',
+        accent: 'var(--accent-color)',
+        whites: 'var(--whites-color)',
+      },
     },
-    transitionDuration: {
-      'fast': '150ms',
-      'slow': '500ms',
-    },
-    colors: {
-      primary: 'var(--primary-color)',
-      secondary: 'var(--secondary-color)',
-      accent: 'var(--accent-color)',
-      whites: 'var(--whites-color)',  },},
-  
-},
+  },
   plugins: [],
 };
-

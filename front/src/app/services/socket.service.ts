@@ -22,7 +22,7 @@ export class SocketService {
     this.socket = io(dns, { withCredentials: true });
     this.socket.on('connected', () => {
       this.loadChatList();
-      this.api.loadActiveClients().subscribe();
+      this.api.loadActiveClients().subscribe(res => res);
     });
 
 
@@ -88,6 +88,19 @@ export class SocketService {
       });
 
       this._chatList.next(chatList);
+
+      if(chatList[chatIndex][0].chatmate_id === this.chatmateId && chatList[chatIndex][0].sender_id === chatList[chatIndex][0].chatmate_id) {
+        
+        chatList[chatIndex].map((x: any) => {
+          
+          if(x.sender_id === x.chatmate_id && ['delivered', 'sent'].includes(x.content_status) && new Date(x.sent_at) <= new Date(data.timestamp))
+            x.content_status = 'seen';
+
+          return x;
+        });
+
+        this._chatList.next(chatList);
+      }
     });
   }
 

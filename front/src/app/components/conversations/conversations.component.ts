@@ -1,7 +1,8 @@
-import { Component, NgModule, OnInit, Input, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, NgModule, OnInit, Input, ViewChild, AfterViewInit, ElementRef, InjectFlags } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { v4 as uuidv4 } from 'uuid';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
 
@@ -39,13 +40,9 @@ export class ConversationComponent implements AfterViewInit {
 
 
     const chatContainer = document.getElementById("chatContainer");
-
-
-    
     chatContainer?.addEventListener("scroll", () => {
-      if(chatContainer.clientHeight + Math.abs(chatContainer.scrollTop) + 1 === chatContainer.scrollHeight) {
+      if(chatContainer.clientHeight + Math.abs(chatContainer.scrollTop) + 1 >= chatContainer.scrollHeight || chatContainer.clientHeight + Math.abs(chatContainer.scrollTop) >= chatContainer.scrollHeight)
         this.api.loadMessages(this.chat.length, this.socket.chatmateId).subscribe(res => this.chat = this.chat.concat(res));
-      }
     });
 
 
@@ -93,12 +90,49 @@ export class ConversationComponent implements AfterViewInit {
 
     this.api.seenChat(chatmateId).subscribe();
   }
-  public renderMessages = () => [...this.chat].reverse();
+
+  public renderMessages = () => {
+
+    let status = ['sent', 'delivered', 'seen'];
+
+    const modified = this.chat as any;
+    modified.map((x: any) => {
+      if(x.chatmate_id !== x.sender_id && x.uuid === undefined) {
+        if(status.includes(x.content_status)) {
+          x['status'] = x.content_status;
+          status.splice(status.indexOf(x.content_status), 1);
+        } else {
+          x['status'] = null;
+        }
+      }
+
+      return x;
+    });
+
+    return [...modified].reverse();
+  }
 
   sendMessage(): void {
-    if(this.newMessage !== '') 
-      this.api.sendMessage(this.chat[0].chatmate_id, this.newMessage).subscribe(res => res !== 200 ? alert('Something went wrong to our connection') : null); 
-    this.newMessage = '';
+    if(this.newMessage !== '') {
+      const UUID = uuidv4();
+
+      const userId = this.chat[0].chatmate_id !== this.chat[0].sender_id ? this.chat[0].sender_id : this.chat[0].receiver_id;
+      this.chat.unshift({ uuid: UUID, content: this.newMessage, status: 'sending', sender_id: userId, receiver_id: this.socket.chatmateId });
+      console.log(this.chat);
+
+      this.api.sendMessage(this.socket.chatmateId, this.newMessage, UUID).subscribe(res => {
+        if(isFinite(res)) {
+          alert('Something went wrong to our connection');
+        } else {
+          const indexToDelete = this.chat.findIndex((x: any) => x.uuid === res.uuid);
+          if(indexToDelete === -1)
+            return;
+
+          this.chat.splice(indexToDelete, 1);
+        }
+      }); 
+      this.newMessage = '';
+    }
   }
 
   fetchMessagesByCategory(): void {

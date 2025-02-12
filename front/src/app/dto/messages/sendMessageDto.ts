@@ -1,4 +1,6 @@
 export interface sendMessageDto {
-    content: string;   
-    receiverId: number;     
+    contentType: string;
+    content: string;
+    receiverId: number;
+    uuid: string;
 }
