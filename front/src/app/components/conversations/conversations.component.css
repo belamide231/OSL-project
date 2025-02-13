@@ -1,7 +1,7 @@
 .expand {
     display: grid;
     grid-template-rows: 0fr;
-    animation: expand .15s ease forwards;
+    animation: expand .3s ease forwards;
 }
 
 .expand > div {

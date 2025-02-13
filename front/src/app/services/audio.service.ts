@@ -6,10 +6,10 @@ import { Injectable } from '@angular/core';
 export class AudioService {
   
   private message = new Audio('assets/audio/message.MP3');
-  private messageInitialization = false;
 
   public playMessage = () => {
-    this.message.muted = true;
+    this.message.muted = false;
     this.message.play();
+    this.message.muted = true;
   }  
 }

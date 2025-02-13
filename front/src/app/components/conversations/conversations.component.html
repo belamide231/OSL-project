@@ -126,9 +126,9 @@
 
     
     <!-- Chat Messages -->
-    <div id="chatContainer" class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 flex flex-col-reverse h-96">
+    <div id="chatContainer" class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 flex flex-col-reverse h-96 scroll-smooth">
 
-      <div *ngIf="chat" class="w-full">
+      <div *ngIf="chat" class="w-full scroll-smooth">
 
         <section *ngFor="let message of renderMessages()" class="pt-2">
 
@@ -143,7 +143,7 @@
 
             </div>
 
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.status !== null"  class="text-xs text-gray-500 w-fit text-right opacity-0 animate-fadeInScale">{{message.status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.status !== null"  class="text-xs text-gray-500 w-fit text-right opacity-0 animate-fadeInScale expand">{{message.status}}</section>
 
           </div>
 
