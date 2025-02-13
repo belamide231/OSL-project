@@ -1,0 +1,9 @@
+@keyframes expandHeight {
+    from {
+      grid-template-rows: 0fr;
+    }
+    to {
+      grid-template-rows: 1fr;
+    }
+  }
+  

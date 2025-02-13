@@ -49,7 +49,6 @@ export class ConversationComponent implements AfterViewInit {
         this.api.loadMessages(this.chat.length, this.socket.chatmateId).subscribe(res => this.chat = this.chat.concat(res));
     });
 
-
     this.fetchMessagesByCategory();
 
     this.api.theme().subscribe((res: any) => {

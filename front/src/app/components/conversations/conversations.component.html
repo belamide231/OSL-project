@@ -126,7 +126,7 @@
 
     
     <!-- Chat Messages -->
-    <div id="chatContainer" class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 flex flex-col-reverse h-96 scroll-smooth">
+    <div id="chatContainer" class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 flex flex-col-reverse h-96 scroll-smooth" style="transition: height 100s ease-in-out;">
 
       <div *ngIf="chat" class="w-full">
 
@@ -148,15 +148,13 @@
 
         </section>
 
-        <section *ngIf="isTyping" class="pt-2">
-          <div class="flex gap-2 flex-col items-start">
-            <div class="bg-gray-100 text-black p-3 rounded-xl max-w-[75%] w-fit shadow-md opacity-0 animate-fadeInScale flex flex-row">
+        <section style="transition: margin .3s ease;" class="pt-2" [ngClass]="isTyping ? 'mb-10' : 'mb-0' ">
+          <div class="flex flex-col items-start">
+            <div class="bg-gray-100 text-black p-3 rounded-xl max-w-[75%] w-fit shadow-md opacity-0 flex flex-row" [ngClass]="isTyping ? 'animate-fadeInScale' : 'animate-fadeOutScale' " style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isTyping ? '40px': '0px' }">
             
-            
-              <span class="text-sm font-semibold whitespace-pre-wrap">typing</span>
-              <span class="w-5" href="https://git.io/typing-svg"><img src="https://readme-typing-svg.herokuapp.com?font=sans-serif&weight=900&size=12&letterSpacing=-1px&duration=3000&pause=2000&color=000000&multiline=true&random=true&width=20&height=20&lines=..." alt="Typing SVG" /></span>
+              <!-- <span class="text-sm font-semibold whitespace-pre-wrap">typing</span> -->
+              <span style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isTyping ? '40px': '0px' }" class="w-5" href="https://git.io/typing-svg"><img src="https://readme-typing-svg.herokuapp.com?font=sans-serif&weight=900&size=12&letterSpacing=-1px&duration=3000&pause=2000&color=000000&multiline=true&random=true&width=20&height=20&lines=..." alt="Typing SVG" /></span>
 
-              
             </div>
           </div>
         </section>

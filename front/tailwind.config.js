@@ -4,12 +4,17 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        fadeInScale: "fadeInScale .15s ease forwards",
+        fadeInScale: "fadeInScale .5s ease forwards",
+        fadeOutScale: "fadeOutScale .5s ease forwards",
       },
       keyframes: {
         fadeInScale: {
           "0%": { opacity: "0", transform: "scale(0)" },
           "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        fadeOutScale: {
+          "0%": { opacity: "1", transform: "scale(1)" },
+          "100%": { opacity: "0", transform: "scale(0)" },
         },
       },
       transitionTimingFunction: {
