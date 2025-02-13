@@ -1,9 +1,37 @@
-@keyframes expandHeight {
+.expand {
+    display: grid;
+    grid-template-rows: 0fr;
+    animation: expand .15s ease forwards;
+}
+
+.expand > div {
+    overflow: hidden;
+}
+
+.shrink {
+    display: grid;
+    grid-template-rows: 1fr;
+    animation: shrink .15s ease forwards;
+}
+
+.shrink > div {
+    overflow: hidden;
+}
+  
+@keyframes expand {
     from {
-      grid-template-rows: 0fr;
+        grid-template-rows: 0fr;
     }
     to {
-      grid-template-rows: 1fr;
+        grid-template-rows: 1fr;
     }
-  }
-  
+}
+
+@keyframes shrink {
+    from {
+        grid-template-rows: 1fr;
+    }
+    to {
+        grid-template-rows: 0fr;
+    }
+}

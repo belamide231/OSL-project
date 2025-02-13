@@ -126,7 +126,7 @@
 
     
     <!-- Chat Messages -->
-    <div id="chatContainer" class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 flex flex-col-reverse h-96 scroll-smooth" style="transition: height 100s ease-in-out;">
+    <div id="chatContainer" class="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 flex flex-col-reverse h-96">
 
       <div *ngIf="chat" class="w-full">
 
@@ -134,11 +134,12 @@
 
           <div class="flex gap-2 flex-col" [ngClass]="message.sender_id === message.chatmate_id ? 'items-start' : 'items-end'">
 
-            <div class="bg-gray-100 text-black p-3 rounded-xl  max-w-[75%] w-fit shadow-md opacity-0 animate-fadeInScale">
-              
-              <p class="text-sm font-semibold whitespace-pre-wrap" [ngClass]="message.sender_id === message.chatmate_id ? 'text-left' : 'text-right' " style="overflow-wrap: anywhere;">{{ message.content }}</p>
-            
-              <section *ngIf="message.sent_at !== undefined" class="text-xs text-gray-500" [ngClass]="message.sender_id === message.chatmate_id ? 'text-left' : 'text-right' ">{{ timePassed(message.sent_at) }}</section>
+            <div class="bg-gray-100 text-black p-3 rounded-xl  max-w-[75%] w-fit shadow-md scroll-smooth expand">
+
+              <div class="animate-fadeInScale">
+                <p class="text-sm font-semibold whitespace-pre-wrap" [ngClass]="message.sender_id === message.chatmate_id ? 'text-left' : 'text-right' " style="overflow-wrap: anywhere;">{{ message.content }}</p>
+                <section *ngIf="message.sent_at !== undefined" class="text-xs text-gray-500" [ngClass]="message.sender_id === message.chatmate_id ? 'text-left' : 'text-right' ">{{ timePassed(message.sent_at) }}</section>
+              </div>
 
             </div>
 
@@ -148,12 +149,15 @@
 
         </section>
 
-        <section style="transition: margin .3s ease;" class="pt-2" [ngClass]="isTyping ? 'mb-10' : 'mb-0' ">
+        <section style="transition: margin .3s ease;" class="pt-2" [ngClass]="isTyping ? 'mb-9' : 'mb-0' ">
           <div class="flex flex-col items-start">
             <div class="bg-gray-100 text-black p-3 rounded-xl max-w-[75%] w-fit shadow-md opacity-0 flex flex-row" [ngClass]="isTyping ? 'animate-fadeInScale' : 'animate-fadeOutScale' " style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isTyping ? '40px': '0px' }">
             
-              <!-- <span class="text-sm font-semibold whitespace-pre-wrap">typing</span> -->
-              <span style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isTyping ? '40px': '0px' }" class="w-5" href="https://git.io/typing-svg"><img src="https://readme-typing-svg.herokuapp.com?font=sans-serif&weight=900&size=12&letterSpacing=-1px&duration=3000&pause=2000&color=000000&multiline=true&random=true&width=20&height=20&lines=..." alt="Typing SVG" /></span>
+              <span style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isTyping ? '40px': '0px' }" class="w-5" href="https://git.io/typing-svg">
+
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="#000000" stroke="#000000" stroke-width="2" r="15" cx="40" cy="65"><animate attributeName="cy" calcMode="spline" dur="2" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="#000000" stroke="#000000" stroke-width="2" r="15" cx="100" cy="65"><animate attributeName="cy" calcMode="spline" dur="2" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="#000000" stroke="#000000" stroke-width="2" r="15" cx="160" cy="65"><animate attributeName="cy" calcMode="spline" dur="2" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>
+
+              </span>
 
             </div>
           </div>
