@@ -1,6 +1,5 @@
-import { Component, NgModule, OnInit, Input, ViewChild, AfterViewInit, ElementRef, InjectFlags } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -33,8 +32,13 @@ export class ConversationComponent implements AfterViewInit {
   public chatListHeads: any = [];
   public chatList: any[] = [];
   public chat: any = [];
+  public isTyping: boolean = false;
 
-  constructor(private chatService: ChatService, private readonly socket: SocketService, private readonly api: ApiService) {}
+  constructor(private chatService: ChatService, private readonly socket: SocketService, private readonly api: ApiService) {
+    
+    this.socket.isTyping.subscribe(x => this.isTyping = x);
+  }
+
 
   ngAfterViewInit(): void {
 
@@ -73,10 +77,17 @@ export class ConversationComponent implements AfterViewInit {
     });
   }
 
-  public timePassed = (stamp: string) => dayjs(stamp).fromNow();
+  public timePassed = (stamp: string) => {
+    return dayjs(stamp).fromNow();
+  }
+
+
   public selectChat = (chatmateId: number) => {
     if(this.socket.chatmateId === chatmateId)
       return;
+
+    this.newMessage = '';
+    this.socket.blankMessage();
 
     this.socket.chatmateId = chatmateId;
     this.chat = this.chatList[this.chatList.findIndex((x: any) => x[0].chatmate_id === this.socket.chatmateId)];
@@ -88,7 +99,7 @@ export class ConversationComponent implements AfterViewInit {
     if(this.chatList[chatIndex][0].content_status === 'seen')
       return;
 
-    this.socket.seenChat(chatmateId);
+    this.socket.seenChat(chatmateId, false);
   }
 
   public renderMessages = () => {
@@ -112,7 +123,13 @@ export class ConversationComponent implements AfterViewInit {
     return [...modified].reverse();
   }
 
-  sendMessage(): void {
+  
+  eventType = () => {
+    this.newMessage === '' ? this.socket.blankMessage() : this.socket.typingMessage();
+  }
+
+
+  sendMessage = () => {
     if(this.newMessage !== '') {
       const UUID = uuidv4();
 
@@ -131,6 +148,7 @@ export class ConversationComponent implements AfterViewInit {
         }
       }); 
       this.newMessage = '';
+      this.socket.blankMessage();
     }
   }
 
@@ -167,7 +185,6 @@ export class ConversationComponent implements AfterViewInit {
       this.fetchMessagesByCategory();
     }
   }
-
 
 
   viewDetails(index: number): void {

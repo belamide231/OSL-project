@@ -1,15 +1,14 @@
 import { Router, Request, Response } from "express";
 
-import { getActiveClientsService, sendMessageService, loadChatListServices, loadMessageService, loadMessagesService, seenChatService, deliveredChatService } from "../services/messageServices";
+import { getActiveClientsService, sendMessageService, loadChatListServices, loadMessageService, loadMessagesService } from "../services/messageServices";
 import { sendMessageDto } from "../dto/messageController/sendMessageDto";
 import { getConversationDto } from "../dto/messageController/getConversationDto";
 import { isAuthenticated } from "../guards/isAuthenticated";
 import { getMessageDto } from "../dto/messageController/getMessageDto";
-import { seenChatDto } from "../dto/messageController/seenChatDto";
 import { loadChatListDto } from "../dto/messageController/loadChatListDto";
 import { upload } from "../utilities/multer";
 import { dropboxUpload } from "../utilities/dropbox";
-import { deliveredChatDto } from "../dto/messageController/deliveredChatDto";
+
 
 export const messageController = Router();
 messageController
@@ -43,8 +42,3 @@ messageController
     const response = await loadMessageService(req.body as getMessageDto, (req.user as any).id);
     return response.status !== 200 ? res.sendStatus(response.status) : res.status(response.status).json(response.result);
 })
-
-
-// .post('/deliveredChat', isAuthenticated, async (req: Request, res: Response): Promise<any> => {
-//     return res.sendStatus(await deliveredChatService((req.user as any).id, req.body as deliveredChatDto));
-// })

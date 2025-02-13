@@ -5,24 +5,41 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { DatabaseService } from './database.service';
 import { ApiService } from './api.service';
 import { dns } from '../../environment/dns';
+import { AudioService } from './audio.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
+  
+  
   private socket: Socket;
+
 
   private _chatList: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
   public chatList: Observable<any[]> = this._chatList.asObservable();
 
+
+  private _actives: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  public actives: Observable<any[]> = this._actives.asObservable();
+
+
+  private _isTyping: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public isTyping: Observable<boolean> = this._isTyping.asObservable();
+
+
   public chatmateId: number = 0;
 
-  constructor(private readonly api: ApiService, private readonly database: DatabaseService) { 
+
+  constructor(private readonly api: ApiService, private readonly database: DatabaseService, private readonly audio: AudioService) { 
+
 
     this.socket = io(dns, { withCredentials: true });
+
+
     this.socket.on('connected', () => {
       this.loadChatList();
-      this.api.loadActiveClients().subscribe(res => res);
+      this.api.loadActiveClients().subscribe(res => this._actives.next(res));
     });
 
 
@@ -65,8 +82,6 @@ export class SocketService {
       this._chatList.next(previousChatList);
 
       const targetMessage = this._chatList.value[this._chatList.value.findIndex(x => x[0].chatmate_id === this.chatmateId)][0];
-      //console.log(targetMessage.content_status);
-      //console.log(targetMessage.chatmate_id !== this.chatmateId);
       if(targetMessage.chatmate_id !== this.chatmateId)
         return
 
@@ -74,7 +89,7 @@ export class SocketService {
       if(seener === targetMessage.sender_id)
         return;
 
-      this.seenChat(targetMessage.chatmate_id);
+      this.seenChat(targetMessage.chatmate_id, true);
     });
 
 
@@ -83,7 +98,8 @@ export class SocketService {
       const chatList = this._chatList.value;
       const chatIndex = chatList.findIndex(x => x[0].chatmate_id === data.chatmate_id);
       chatList[chatIndex].map((x: any) => {
-        if(x.sender_id !== x.chatmate_id && x.content_status === 'delivered' && new Date(x.sent_at) <= new Date(data.timestamp)) 
+        
+        if(x.sender_id !== x.chatmate_id && ['delivered'].includes(x.content_status) && new Date(x.sent_at) <= new Date(data.timestamp))
           x.content_status = 'seen';
         
         return x;
@@ -92,9 +108,9 @@ export class SocketService {
       this._chatList.next(chatList);
 
       if(chatList[chatIndex][0].chatmate_id === this.chatmateId && chatList[chatIndex][0].sender_id === chatList[chatIndex][0].chatmate_id) {
-        
+
         chatList[chatIndex].map((x: any) => {
-          
+
           if(x.sender_id === x.chatmate_id && ['delivered', 'sent'].includes(x.content_status) && new Date(x.sent_at) <= new Date(data.timestamp))
             x.content_status = 'seen';
 
@@ -102,13 +118,56 @@ export class SocketService {
         });
 
         this._chatList.next(chatList);
+        
+        data.notify && this.audio.playMessage();
       }
+    });
+
+
+    this.socket.on('typing message', () => {
+
+      const chatmateId = this._actives.value.findIndex(x => x.id === this.chatmateId);
+      if(chatmateId === -1) return;
+
+      this._isTyping.next(true);
+    });
+
+    this.socket.on('blank message', () => {
+
+      this._isTyping.next(false);
+    });
+
+    this.socket.on('disconnected', (disconnectingId: number) => {
+
+      disconnectingId === this.chatmateId && this._isTyping.next(false);
     });
   }
 
 
-  public seenChat = (chatmateId: number) => this.socket.emit("seen chat", chatmateId);
-  public messageDelivered = (chatmatesId: number[]) => this.socket.emit("message delivered", chatmatesId);
+  public seenChat = (chatmateId: number, notify: boolean) => {
+
+    this.socket.emit("seen chat", { chatmateId, notify });
+  }
+
+
+  public messageDelivered = (chatmatesId: number[]) => {
+
+    this.socket.emit("message delivered", chatmatesId);
+  }
+
+
+  public typingMessage = () => {
+
+    this.socket.emit("typing message", this.chatmateId);
+  }
+
+
+  public blankMessage = () => {
+
+    this.socket.emit("blank message", this.chatmateId);
+  }
+  
+
 
   private loadChatList = () => {
     this.api.loadChatList(this._chatList.value.length).subscribe(async (res: any) => {
@@ -126,7 +185,7 @@ export class SocketService {
       if(seener === targetMessage.sender_id)
         return;
 
-      this.seenChat(targetMessage.chatmate_id);
+      this.seenChat(targetMessage.chatmate_id, false);
     });
   }
 }

@@ -4,7 +4,7 @@ import { socketClients, redis } from "../app";
 import { cookiesParser } from "../utilities/cookieParser";
 import { io } from "../app";
 import { verifyAccessToken } from "../utilities/jwt";
-import { messageDelivered, receiveMessageSocket } from "./message";
+import { blankMessage, messageDelivered, seenChat, typingMessage } from "./message";
 
 export const connection = async (socket: any): Promise<any> => {
     const cookies = socket.request.headers.cookie;
@@ -51,33 +51,35 @@ export const connection = async (socket: any): Promise<any> => {
 
     io.to(socket.id).emit('connected');
     
-    socket.on("seen chat", (chatmateId: number) => receiveMessageSocket(socket, chatmateId));
+    socket.on("seen chat", (data: any) => seenChat(socket, data));
     socket.on("message delivered", (chatmatesId: number[]) => messageDelivered(socket, chatmatesId));
-
+    socket.on("typing message", (chatmateId: number) => typingMessage(socket, chatmateId));
+    socket.on("blank message", (chatmateId: number) => blankMessage(socket, chatmateId));    
+    
     socket.on("disconnect", async () => {
         
         socketClients.clientConnections[id].splice(socketClients.clientConnections[id].indexOf(socket.id), 1);
 
-        if (socketClients.clientConnections[id].length === 0) {
-            io.emit("disconnected");
+        if(socketClients.clientConnections[id].length !== 0) return;
 
-            delete socketClients.clientConnections[id];
-            await redis.con.del("db4:" + id.toString());
+        io.emit("disconnected", socket.user.id);
 
-            switch (client.role) {
-                case "admin":
-                    socketClients.adminsId.splice(socketClients.adminsId.indexOf(id), 1);
-                break;
-                case "account":
-                    socketClients.adminsId.splice(socketClients.accountsId.indexOf(id), 1);
-                break;
-                case "superUser":
-                    socketClients.adminsId.splice(socketClients.superUsersId.indexOf(id), 1);
-                break;
-                case "user":
-                    socketClients.adminsId.splice(socketClients.usersId.indexOf(id), 1);
-                break;
-            }
+        delete socketClients.clientConnections[id];
+        await redis.con.del("db4:" + id.toString());
+
+        switch (client.role) {
+            case "admin":
+                socketClients.adminsId.splice(socketClients.adminsId.indexOf(id), 1);
+            break;
+            case "account":
+                socketClients.adminsId.splice(socketClients.accountsId.indexOf(id), 1);
+            break;
+            case "superUser":
+                socketClients.adminsId.splice(socketClients.superUsersId.indexOf(id), 1);
+            break;
+            case "user":
+                socketClients.adminsId.splice(socketClients.usersId.indexOf(id), 1);
+            break;
         }
     });
 };
