@@ -140,10 +140,10 @@
                 <p class="text-sm font-semibold whitespace-pre-wrap" [ngClass]="message.sender_id === message.chatmate_id ? 'text-left' : 'text-right' " style="overflow-wrap: anywhere;">{{ message.content }}</p>
                 <section *ngIf="message.sent_at !== undefined" class="text-xs text-gray-500" [ngClass]="message.sender_id === message.chatmate_id ? 'text-left' : 'text-right' ">{{ timePassed(message.sent_at) }}</section>
               </div>
-
             </div>
 
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.status !== null"  class="text-xs text-gray-500 w-fit text-right opacity-0 animate-fadeInScale expand">{{message.status}}</section>
+            
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.status !== null"  class="text-xs text-gray-500 w-fit text-right animate-fadeInScale expand">{{message.status}}</section>
 
           </div>
 
