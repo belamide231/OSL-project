@@ -1,17 +1,7 @@
-.expand {
-    display: grid;
-    grid-template-rows: 0fr;
-    animation: expand .3s ease forwards;
-}
-
-.expand > div {
-    overflow: hidden;
-}
-
 .shrink {
     display: grid;
     grid-template-rows: 1fr;
-    animation: shrink .15s ease forwards;
+    animation: shrink .3s ease forwards;
 }
 
 .shrink > div {
@@ -27,6 +17,18 @@
     }
 }
 
+
+.expand {
+    display: grid;
+    grid-template-rows: 0fr;
+    animation: expand .15s ease forwards;
+    transition: grid .1s ease;
+}
+
+.expand > div {
+    overflow: hidden;
+}
+
 @keyframes shrink {
     from {
         grid-template-rows: 1fr;
@@ -35,3 +37,17 @@
         grid-template-rows: 0fr;
     }
 }
+
+.status-out {
+    opacity: 0;
+    height: 0px;
+    transition: opacity .1s ease, height .5s ease;
+}
+
+.status-in {
+    opacity: 1;
+    height: 10px;
+    transition: opacity .1s ease, height .5s ease;
+}
+
+

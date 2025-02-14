@@ -36,10 +36,10 @@
         />
       </div>
 
-      <ul class="space-y-3 overflow-y-auto  overflow-x-hidden h-[40vh]">
+      <ul class="space-y-3 overflow-y-auto overflow-x-hidden h-[40vh]">
         <li *ngFor="let chatHead of chatListHeads"
           (click)="selectChat(chatHead.chatmate_id)"
-          class="cursor-pointer p-3 hover:bg-gray-300 rounded-lg opacity-0 animate-fadeInScale"
+          class="cursor-pointer p-3 hover:bg-gray-300 rounded-lg select-none"
           [ngClass]="chatHead.chatmate_id === chatHead.sender_id && chatHead.content_status !== 'seen' ? 'bg-gray-200' : 'bg-gray-100' "
         >
           <div class="flex justify-between items-center mb-1">
@@ -130,26 +130,32 @@
 
       <div *ngIf="chat" class="w-full scroll-smooth">
 
-        <section *ngFor="let message of renderMessages()" class="pt-2">
+        <section *ngFor="let message of renderMessages()">
 
-          <div class="flex gap-2 flex-col" [ngClass]="message.sender_id === message.chatmate_id ? 'items-start' : 'items-end'">
+          <div class="flex gap-2 flex-col" [ngClass]="message.sender_id === message.chatmate_id ? 'items-start pt-2' : 'items-end'">
 
-            <div class="bg-gray-100 text-black p-3 rounded-xl  max-w-[75%] w-fit shadow-md scroll-smooth expand">
-
-              <div class="animate-fadeInScale">
-                <p class="text-sm font-semibold whitespace-pre-wrap" [ngClass]="message.sender_id === message.chatmate_id ? 'text-left' : 'text-right' " style="overflow-wrap: anywhere;">{{ message.content }}</p>
-                <section *ngIf="message.sent_at !== undefined" class="text-xs text-gray-500" [ngClass]="message.sender_id === message.chatmate_id ? 'text-left' : 'text-right' ">{{ timePassed(message.sent_at) }}</section>
+            <div class="flex flex-row items-center w-full" [ngClass]="message.sender_id === message.chatmate_id ? 'justify-start' : 'justify-end' ">
+              <section *ngIf="message.sent_at !== undefined && message.id === isTimePassed && message.sender_id !== message.chatmate_id" class="text-xs text-gray-500 pr-5 text-left animate-fadeInScale">{{ timePassed(message.sent_at) }}</section>     
+              <div (mouseover)="setTimePassed(message.id)" (mouseleave)="deleteTimePassed()" class="bg-gray-100 text-black p-3 rounded-b-3xl max-w-[75%] w-fit shadow-md scroll-smooth expand" [ngClass]="message.chatmate_id === message.sender_id ? 'rounded-tr-3xl' : 'rounded-tl-3xl' ">
+                <div class="animate-fadeInScale">
+                  <p class="text-sm font-semibold whitespace-pre-wrap text-left pl-2 pr-2" style="overflow-wrap: anywhere;">{{ message.content }}</p>
+                </div>
               </div>
+              <section *ngIf="message.sent_at !== undefined && message.id === isTimePassed && message.sender_id === message.chatmate_id" class="text-xs text-gray-500 pl-5 text-left animate-fadeInScale">{{ timePassed(message.sent_at) }}</section>
             </div>
 
-            
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.status !== null"  class="text-xs text-gray-500 w-fit text-right animate-fadeInScale expand">{{message.status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sending' " class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in' : 'status-out' ">{{message.content_status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sent'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in' : 'status-out' ">{{message.content_status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'delivered'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in' : 'status-out' ">{{message.content_status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'seen'" class="select-none flex items-center justify-center italic font-mono text-xs text-white text-right bg-accent rounded-full" [ngClass]="message.status ? 'size-3' : 'size-0' " style="transition: all .3s ease;">{{message.chatmate[0]}}</section>
 
           </div>
 
         </section>
 
-        <section style="transition: margin .3s ease;" class="pt-2" [ngClass]="isTyping ? 'mb-9' : 'mb-0' ">
+        <section style="transition: margin .3s ease;" class="pt-2" [ngClass]="isTyping ? 'mb-9 status-in' : 'mb-0 status-out' ">
+
+
           <div class="flex flex-col items-start">
             <div class="bg-gray-100 text-black p-3 rounded-xl max-w-[75%] w-fit shadow-md opacity-0 flex flex-row" [ngClass]="isTyping ? 'animate-fadeInScale' : 'animate-fadeOutScale' " style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isTyping ? '40px': '0px' }">
             
@@ -171,41 +177,33 @@
 
 
       <!-- Message Input -->
-<div *ngIf="chat != false" class="flex items-center gap-2 border-t pt-4">
-  <input
-    type="text"
-    [(ngModel)]="newMessage"
-    (input)="eventType()"
-    class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-    placeholder="Type a message..."
-  />
-  <button title="attachment"
-  (click)="sendAttachment()"
-  class="bg-gray-400 text-white py-2 px-4 rounded-lg hover:bg-accent transition duration-200"
->
-  <svg class="w-5 h-5" viewBox="-8 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-  <title>attachment</title>
-  <desc>Created with Sketch Beta.</desc>
-  <defs>
-    </defs>
+  <form *ngIf="chat != false" (ngSubmit)="sendMessage()" class="select-none flex items-center gap-2 border-t pt-4">
+    <input type="text" [(ngModel)]="newMessage" (input)="eventType()" class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Type a message..."/>
+      <button title="attachment" type="button" (click)="sendAttachment()" class="bg-gray-400 text-white py-2 px-4 rounded-lg hover:bg-accent transition duration-200">
+      <svg class="w-5 h-5" viewBox="-8 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+        <title>attachment</title>
+        <desc>Created with Sketch Beta.</desc>
+        <defs>
+        </defs>
         <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
             <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-212.000000, -151.000000)" fill="#000000">
               <path d="M226,155 L226,175 C226,178.313 223.313,181 220,181 C216.687,181 214,178.313 214,175 L214,157 C214,154.791 215.791,153 218,153 C220.209,153 222,154.791 222,157 L222,175 C222,176.104 221.104,177 220,177 C218.896,177 218,176.104 218,175 L218,159 L216,159 L216,175 C216,177.209 217.791,179 220,179 C222.209,179 224,177.209 224,175 L224,157 C224,153.687 221.313,151 218,151 C214.687,151 212,153.687 212,157 L212,176 C212.493,179.945 215.921,183 220,183 C224.079,183 227.507,179.945 228,176 L228,155 L226,155" id="attachment" sketch:type="MSShapeGroup">
               </path>
             </g>
         </g>
-    </svg>
-      </button>
-        <button
-          (click)="sendMessage()"
-          class="bg-accent text-white py-2 px-4 rounded-lg hover:bg-primary transition duration-200"
-        >
-          Send
-        </button>
-      </div>
-    </div>
-  </div>
+      </svg>
+    </button>
+    <input type="submit" value="Send" class="bg-accent text-white py-2 px-4 rounded-lg hover:bg-primary transition duration-200"/>
+  </form>
+
+
+
 </div>
+</div>
+</div>
+
+
+
        <!-- Compose Message Modal -->
        <div *ngIf="composeModal" (click)="showComposeModal()" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
         <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">

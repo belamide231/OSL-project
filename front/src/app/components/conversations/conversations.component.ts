@@ -33,6 +33,7 @@ export class ConversationComponent implements AfterViewInit {
   public chatList: any[] = [];
   public chat: any = [];
   public isTyping: boolean = false;
+  public isTimePassed: number = 0;
 
   constructor(private chatService: ChatService, private readonly socket: SocketService, private readonly api: ApiService) {
     
@@ -80,6 +81,13 @@ export class ConversationComponent implements AfterViewInit {
     return dayjs(stamp).fromNow();
   }
 
+  public setTimePassed = (messageId: number) => {
+    this.isTimePassed = messageId;
+  }
+
+  public deleteTimePassed = () => {
+    this.isTimePassed = 0;
+  }
 
   public selectChat = (chatmateId: number) => {
     if(this.socket.chatmateId === chatmateId)
