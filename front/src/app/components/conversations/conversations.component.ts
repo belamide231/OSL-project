@@ -108,6 +108,8 @@ export class ConversationComponent implements AfterViewInit {
     this.socket.blankMessage();
 
     this.socket.chatmateId = chatmateId;
+    this.socket.checkIfChatmateIsTyping(chatmateId);
+
     this.chat = this.chatList[this.chatList.findIndex((x: any) => x[0].chatmate_id === this.socket.chatmateId)];
     
     const chatIndex = this.chatList.findIndex((x: any) => x[0].chatmate_id === chatmateId);

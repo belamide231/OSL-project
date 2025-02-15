@@ -27,6 +27,7 @@ export class SocketService {
   private _isTyping: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public isTyping: Observable<boolean> = this._isTyping.asObservable();
 
+  private _typingChatmates: number[] = [];
 
   public chatmateId: number = 0;
 
@@ -138,14 +139,27 @@ export class SocketService {
     });
 
 
-    this.socket.on('typing message', () => {
-      this._isTyping.next(true);
+    this.socket.on('typing message', (typingChatmateId: number) => {
+      this._typingChatmates.push(typingChatmateId);
+      if(this._typingChatmates.indexOf(typingChatmateId) === -1) return;
+
+      console.log(this._typingChatmates);
+      console.log(this._typingChatmates.includes(typingChatmateId));
+
+      this._typingChatmates.includes(typingChatmateId) ? this._isTyping.next(true) : this._isTyping.next(false);
     });
 
-    this.socket.on('blank message', () => {
 
-      this._isTyping.next(false);
+    this.socket.on('blank message', (typingChatmateId: number) => {
+      const index = this._typingChatmates.indexOf(typingChatmateId);
+      
+      if(index === -1) return;
+
+      this._typingChatmates.splice(index, 1);
+      
+      if(typingChatmateId === this.chatmateId) this._isTyping.next(false);
     });
+
 
     this.socket.on('disconnected', (disconnectingId: number) => {
 
@@ -178,11 +192,16 @@ export class SocketService {
   }
 
 
+  public checkIfChatmateIsTyping = (chatmateId: number) => {
+
+    this._typingChatmates.includes(chatmateId) ? this._isTyping.next(true) : this._isTyping.next(false);
+  }
+
+
   public blankMessage = () => {
 
     this.socket.emit("blank message", this.chatmateId);
   }
-  
 
 
   private loadChatList = () => {

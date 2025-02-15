@@ -161,8 +161,8 @@
             </div>
 
             <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sending' " class="select-none text-xs text-gray-500 w-fit text-right mb-4" [ngClass]="message.status ? 'status-in' : 'status-out' ">{{message.content_status}}</section>
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sent'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in' : 'status-out' ">{{message.content_status}}</section>
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'delivered'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in' : 'status-out' ">{{message.content_status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sent'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in mb-4' : 'status-out mb-0' ">{{message.content_status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'delivered'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in mb-4' : 'status-out mb-0' ">{{message.content_status}}</section>
             <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'seen'" class="select-none flex items-center justify-center italic font-mono text-xs text-white text-right bg-accent rounded-full" [ngClass]="message.status ? 'size-3 mb-1' : 'size-0 mb-0' " style="transition: all .3s ease;">{{message.chatmate[0]}}</section>
 
           </div>

@@ -28,7 +28,7 @@ export const messageDelivered = async (user: socketUser, chatmatesId: number[]):
 
 
 export const typingMessage = async (user: socketUser, chatmateId: number): Promise<void> => {
-    console.log('SHIT');
+
     io.to(socketClients.clientConnections[chatmateId]).emit("typing message", user.id);
 }
 
