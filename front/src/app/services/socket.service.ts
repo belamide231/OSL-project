@@ -143,9 +143,6 @@ export class SocketService {
       this._typingChatmates.push(typingChatmateId);
       if(this._typingChatmates.indexOf(typingChatmateId) === -1) return;
 
-      console.log(this._typingChatmates);
-      console.log(this._typingChatmates.includes(typingChatmateId));
-
       this._typingChatmates.includes(typingChatmateId) ? this._isTyping.next(true) : this._isTyping.next(false);
     });
 

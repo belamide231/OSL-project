@@ -47,9 +47,10 @@
             <span class="text-primary font-semibold">{{ chatHead.chatmate }}</span>
             <span class="text-xs text-gray-500">{{ timePassed(chatHead.sent_at) }}</span>
           </div>
-
-          <p class="text-sm text-gray-600 truncate" [ngClass]="chatHead.chatmate_id === chatHead.sender_id && chatHead.content_status !== 'seen' ? 'font-bold' : '' ">{{ chatHead.chatmate_id === chatHead.sender_id ? chatHead.chatmate + ': ' + chatHead.content : 'You: ' + chatHead.content }}</p>
-
+          <div class="flex flex-row justify-between items-end">
+            <p class="text-sm text-gray-600 truncate max-w-[85%]" [ngClass]="chatHead.chatmate_id === chatHead.sender_id && chatHead.content_status !== 'seen' ? 'font-bold' : '' ">{{ chatHead.chatmate_id === chatHead.sender_id ? chatHead.chatmate + ': ' + chatHead.content : 'You: ' + chatHead.content }}</p>
+            <div [ngClass]="chatHead.content_status === 'seen' && chatHead.sender_id !== chatHead.chatmate_id ? 'opacity-1': 'opacity-0' " class="rounded-full bg-accent font-mono italic size-4 flex justify-center items-center text-white" style="animation: opacity .3s ease;">{{chatHead.chatmate[0]}}</div>  
+          </div>
           <!-- <div class="text-xs text-gray-500 mt-2">
             <span *ngIf="message.priority" class="text-red-500 font-semibold">Priority</span>
             <span *ngIf="message.status === 'open'" class="text-green-500 ml-2">Open</span>
@@ -133,7 +134,7 @@
 
         <section *ngFor="let message of renderMessages()">
 
-          <section *ngIf="message.new_conversation" class="pt-5 pb-5 flex items-center justify-center relative select-none">
+          <section *ngIf="message.new_conversation" class="pt-6 pb-5 flex items-center justify-center relative select-none">
             <hr class="w-[90%] border-gray-300">
             <span class="absolute pl-10 pr-10 bg-white text-xs text-gray-500">{{getDate(message.sent_at)}}</span>
           </section>
@@ -163,7 +164,7 @@
             <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sending' " class="select-none text-xs text-gray-500 w-fit text-right mb-4" [ngClass]="message.status ? 'status-in' : 'status-out' ">{{message.content_status}}</section>
             <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sent'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in mb-4' : 'status-out mb-0' ">{{message.content_status}}</section>
             <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'delivered'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in mb-4' : 'status-out mb-0' ">{{message.content_status}}</section>
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'seen'" class="select-none flex items-center justify-center italic font-mono text-xs text-white text-right bg-accent rounded-full" [ngClass]="message.status ? 'size-3 mb-1' : 'size-0 mb-0' " style="transition: all .3s ease;">{{message.chatmate[0]}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'seen'" class="select-none flex items-center justify-center italic font-mono text-xs text-white text-right bg-accent rounded-full" [ngClass]="message.status ? 'size-4 mb-1' : 'size-0 mb-0' " style="transition: all .3s ease;">{{message.chatmate[0]}}</section>
 
           </div>
 
@@ -173,7 +174,7 @@
 
 
           <div class="flex flex-col items-start">
-            <div class="bg-gray-100 text-black p-3 rounded-xl max-w-[75%] w-fit shadow-md opacity-0 flex flex-row" [ngClass]="isChatmateTyping ? 'animate-fadeInScale' : 'animate-fadeOutScale' " style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isChatmateTyping ? '40px': '0px' }">
+            <div class="bg-gray-100 text-black p-3 rounded-3xl max-w-[75%] w-fit shadow-md opacity-0 flex flex-row" [ngClass]="isChatmateTyping ? 'animate-fadeInScale' : 'animate-fadeOutScale' " style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isChatmateTyping ? '40px': '0px' }">
             
               <span style="overflow: hidden; transition: .3s ease;" [ngStyle]="{ 'height': isChatmateTyping ? '40px': '0px' }" class="w-5" href="https://git.io/typing-svg">
 

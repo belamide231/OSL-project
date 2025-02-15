@@ -109,6 +109,7 @@ export class ConversationComponent implements AfterViewInit {
 
     this.socket.chatmateId = chatmateId;
     this.socket.checkIfChatmateIsTyping(chatmateId);
+    this.isUserTyping = false && this.newMessage !== '';
 
     this.chat = this.chatList[this.chatList.findIndex((x: any) => x[0].chatmate_id === this.socket.chatmateId)];
     
@@ -211,7 +212,7 @@ export class ConversationComponent implements AfterViewInit {
     if(stamp.getDate() === current.getDate() && stamp.getMonth() === current.getMonth() && stamp.getFullYear() === current.getFullYear()) 
       return time;
     if(stamp.getDate() === current.getDate()-1 && stamp.getMonth() === current.getMonth() && stamp.getFullYear() === current.getFullYear()) 
-      return `Yesturday ${time}`;
+      return `Yesterday ${time}`;
     if(stamp.getTime() < (current.getTime() - 2 * 24 * 60 * 60 * 1000) && stamp.getTime() > (current.getTime() - 7 * 24 * 60 * 60 * 1000) && stamp.getMonth() === current.getMonth() && stamp.getFullYear() === current.getFullYear())
       return `${daysInWeek[stamp.getDay()]} ${time}`;
     if(stamp.getMonth() !== current.getMonth() && stamp.getFullYear() === stamp.getFullYear())
@@ -220,7 +221,6 @@ export class ConversationComponent implements AfterViewInit {
       return `${monthsInYears[stamp.getMonth()]} ${stamp.getDate()}, ${stamp.getFullYear()}, ${time}`;
     return '';
   }
-
   
   eventType = () => {
     if(!this.isUserTyping && this.newMessage !== '') {

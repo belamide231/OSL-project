@@ -43,7 +43,7 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        fadeInScale: "fadeInScale .7s ease forwards",
+        fadeInScale: "fadeInScale 1s ease forwards",
         fadeOutScale: "fadeOutScale .1s ease forwards",
       },
       keyframes: {
