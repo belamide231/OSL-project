@@ -139,7 +139,7 @@
             <span class="absolute pl-10 pr-10 bg-white text-xs text-gray-500">{{getDate(message.sent_at)}}</span>
           </section>
 
-          <div class="flex gap-2 flex-col" [ngClass]="message.sender_id === message.chatmate_id ? 'items-start pt-2' : 'items-end'">
+          <div class="flex flex-col mt-2" [ngClass]="message.sender_id === message.chatmate_id ? 'items-start' : 'items-end'">
 
             <div class="flex flex-row items-center w-full" [ngClass]="message.sender_id === message.chatmate_id ? 'justify-start' : 'justify-end' ">
               <section *ngIf="message.sent_at !== undefined && message.id === isTimePassed && message.sender_id !== message.chatmate_id" class="text-xs text-gray-500 pr-5 text-left animate-fadeInScale">{{ getDate(message.sent_at) }}</section>     
@@ -155,16 +155,16 @@
                 ''
               ">
                 <div class="animate-fadeInScale">
-                  <p class="text-sm font-semibold whitespace-pre-wrap text-left pl-2 pr-2" style="overflow-wrap: anywhere;">{{ message.content }}</p>
+                  <p class="text-sm font-semibold whitespace-pre-wrap text-left px-1" style="overflow-wrap: anywhere;">{{ message.content }}</p>
                 </div>
               </div>
               <section *ngIf="message.sent_at !== undefined && message.id === isTimePassed && message.sender_id === message.chatmate_id" class="text-xs text-gray-500 pl-5 text-left animate-fadeInScale">{{ getDate(message.sent_at) }}</section>
             </div>
 
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sending' " class="select-none text-xs text-gray-500 w-fit text-right mb-4" [ngClass]="message.status ? 'status-in' : 'status-out' ">{{message.content_status}}</section>
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sent'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in mb-4' : 'status-out mb-0' ">{{message.content_status}}</section>
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'delivered'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in mb-4' : 'status-out mb-0' ">{{message.content_status}}</section>
-            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'seen'" class="select-none flex items-center justify-center italic font-mono text-xs text-white text-right bg-accent rounded-full" [ngClass]="message.status ? 'size-4 mb-1' : 'size-0 mb-0' " style="transition: all .3s ease;">{{message.chatmate[0]}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sending' " class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in my-2' : 'status-out my-0' ">{{message.content_status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'sent'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in my-2' : 'status-out my-0' ">{{message.content_status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'delivered'" class="select-none text-xs text-gray-500 w-fit text-right" [ngClass]="message.status ? 'status-in my-2' : 'status-out my-0' ">{{message.content_status}}</section>
+            <section *ngIf="message.chatmate_id !== message.sender_id && message.content_status === 'seen'" class="select-none flex items-center justify-center italic font-mono text-xs text-white text-right bg-accent rounded-full" [ngClass]="message.status ? 'size-4 mt-3' : 'size-0 mt-0' " style="transition: all .3s ease;">{{message.chatmate[0]}}</section>
 
           </div>
 
