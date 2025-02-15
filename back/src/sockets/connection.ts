@@ -5,8 +5,9 @@ import { cookiesParser } from "../utilities/cookieParser";
 import { io } from "../app";
 import { verifyAccessToken } from "../utilities/jwt";
 import { blankMessage, messageDelivered, seenChat, typingMessage } from "./message";
+import { socketUser } from "../interface/socketUser";
 
-export const connection = async (socket: any): Promise<any> => {
+export const connection = async (socket: Socket): Promise<any> => {
     const cookies = socket.request.headers.cookie;
     if (!cookies) return;
 
@@ -18,13 +19,13 @@ export const connection = async (socket: any): Promise<any> => {
 
     const client = decoded.payload;
     const id = client.sub;
-
-    socket.user = {
+    const user: socketUser = {
         id: client.sub,
         name: client.name,
         role: client.role,
-        company: client.company
-    }
+        company: client.company,
+        picture: client.picture
+    };
 
     try {
         await redis.con.set("db4:" + id.toString(), client.sid, { EX: 60 * 60 });
@@ -50,11 +51,12 @@ export const connection = async (socket: any): Promise<any> => {
     }
 
     io.to(socket.id).emit('connected');
+    socket.broadcast.emit('someone joined', (user));
     
-    socket.on("seen chat", (data: any) => seenChat(socket, data));
-    socket.on("message delivered", (chatmatesId: number[]) => messageDelivered(socket, chatmatesId));
-    socket.on("typing message", (chatmateId: number) => typingMessage(socket, chatmateId));
-    socket.on("blank message", (chatmateId: number) => blankMessage(socket, chatmateId));    
+    socket.on("seen chat", (data: any) => seenChat(user, data));
+    socket.on("message delivered", (chatmatesId: number[]) => messageDelivered(user, chatmatesId));
+    socket.on("typing message", (chatmateId: number) => typingMessage(user, chatmateId));
+    socket.on("blank message", (chatmateId: number) => blankMessage(user, chatmateId));    
     
     socket.on("disconnect", async () => {
         
@@ -62,7 +64,7 @@ export const connection = async (socket: any): Promise<any> => {
 
         if(socketClients.clientConnections[id].length !== 0) return;
 
-        io.emit("disconnected", socket.user.id);
+        io.emit("disconnected", user.id);
 
         delete socketClients.clientConnections[id];
         await redis.con.del("db4:" + id.toString());

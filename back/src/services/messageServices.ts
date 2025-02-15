@@ -3,10 +3,8 @@ import { getConversationDto } from "../dto/messageController/getConversationDto"
 import { getMessageDto } from "../dto/messageController/getMessageDto";
 import { sendMessageDto } from "../dto/messageController/sendMessageDto";
 import { loadChatListDto } from "../dto/messageController/loadChatListDto";
-import { seenChatDto } from "../dto/messageController/seenChatDto";
 import { validContentType } from "../validations/validContentType";
 import { validRoles } from "../validations/validRoles";
-import { deliveredChatDto } from "../dto/messageController/deliveredChatDto";
 
 
 export const sendMessageService = async (data: sendMessageDto, senderId: number): Promise<number | object> => {

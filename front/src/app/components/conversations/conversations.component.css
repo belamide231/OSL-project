@@ -22,7 +22,7 @@
     display: grid;
     grid-template-rows: 0fr;
     animation: expand .15s ease forwards;
-    transition: grid .1s ease;
+    transition: grid .1s ease, border-radius 3s ease;
 }
 
 .expand > div {

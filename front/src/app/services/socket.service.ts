@@ -39,8 +39,22 @@ export class SocketService {
 
     this.socket.on('connected', () => {
       this.loadChatList();
-      this.api.loadActiveClients().subscribe(res => this._actives.next(res));
+      this.api.loadActiveClients().subscribe(res => {
+        this._actives.next(res);
+      });
     });
+
+
+    this.socket.on('someone joined', (client: any) => {
+      const actives = this._actives.value;
+      if(actives.length === 0) return;
+
+      const index = actives.findIndex((x: any) => x.id === client.id);
+      if(index !== -1) return;
+
+      const updatedActives: any = this._actives.value.push(client);
+      this._actives.next(updatedActives);
+    })
 
 
     this.socket.on('receive message', async (messageId) => {
@@ -119,16 +133,12 @@ export class SocketService {
 
         this._chatList.next(chatList);
         
-        data.notify && this.audio.playMessage();
+        // data.notify && this.audio.playMessage();
       }
     });
 
 
     this.socket.on('typing message', () => {
-
-      const chatmateId = this._actives.value.findIndex(x => x.id === this.chatmateId);
-      if(chatmateId === -1) return;
-
       this._isTyping.next(true);
     });
 
@@ -140,6 +150,12 @@ export class SocketService {
     this.socket.on('disconnected', (disconnectingId: number) => {
 
       disconnectingId === this.chatmateId && this._isTyping.next(false);
+      const actives = this._actives.value;
+      const index = actives.findIndex(x => x.id === disconnectingId);
+      if(index === -1) return;
+      
+      actives.splice(index, 1);
+      this._actives.next(actives);
     });
   }
 

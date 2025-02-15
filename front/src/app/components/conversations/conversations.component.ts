@@ -32,12 +32,14 @@ export class ConversationComponent implements AfterViewInit {
   public chatListHeads: any = [];
   public chatList: any[] = [];
   public chat: any = [];
-  public isTyping: boolean = false;
+  public isChatmateTyping: boolean = false;
   public isTimePassed: number = 0;
+  public isMessagesLoading: boolean = false;
+  public isUserTyping: boolean = false;
 
   constructor(private chatService: ChatService, private readonly socket: SocketService, private readonly api: ApiService) {
     
-    this.socket.isTyping.subscribe(x => this.isTyping = x);
+    this.socket.isTyping.subscribe(x => this.isChatmateTyping = x);
   }
 
 
@@ -46,8 +48,17 @@ export class ConversationComponent implements AfterViewInit {
 
     const chatContainer = document.getElementById("chatContainer");
     chatContainer?.addEventListener("scroll", () => {
-      if(chatContainer.clientHeight + Math.abs(chatContainer.scrollTop) + 1 >= chatContainer.scrollHeight || chatContainer.clientHeight + Math.abs(chatContainer.scrollTop) >= chatContainer.scrollHeight)
-        this.api.loadMessages(this.chat.length, this.socket.chatmateId).subscribe(res => this.chat = this.chat.concat(res));
+      if(chatContainer.clientHeight + Math.abs(chatContainer.scrollTop) + 1 >= chatContainer.scrollHeight || chatContainer.clientHeight + Math.abs(chatContainer.scrollTop) >= chatContainer.scrollHeight) {
+        if(this.isMessagesLoading)
+          return;
+
+        this.isMessagesLoading = true;
+        this.api.loadMessages(this.chat.length, this.socket.chatmateId).subscribe(res => {
+          
+          this.chat = this.chat.concat(res);  
+          this.isMessagesLoading = false;
+        });
+      }
     });
 
     this.fetchMessagesByCategory();
@@ -112,27 +123,113 @@ export class ConversationComponent implements AfterViewInit {
   public renderMessages = () => {
 
     let status = ['sent', 'delivered', 'seen'];
+    let last = 0;
+    let latestSentAt: string = '';
 
     const modified = this.chat as any;
-    modified.map((x: any) => {
+
+    modified.forEach((x: any, i: number) => {
+
       if(x.chatmate_id !== x.sender_id && x.uuid === undefined) {
         if(status.includes(x.content_status)) {
-          x['status'] = x.content_status;
+          modified[i]['status'] = x.content_status;
           status.splice(status.indexOf(x.content_status), 1);
         } else {
-          x['status'] = null;
+          modified[i]['status'] = null;
         }
+      }
+
+      if(modified[i].sent_at) {
+        if(latestSentAt === '') {
+          latestSentAt = x.sent_at;
+        } else {
+          const latest = (new Date(latestSentAt)).getTime();
+          latestSentAt = x.sent_at;
+
+          const previous = (new Date(x.sent_at)).getTime();
+          const elapsedSeconds = Math.floor((latest - previous) / 1000);
+
+          const t = i-1;
+          modified[t]['new_conversation'] = true && elapsedSeconds >= 60 * 60;
+        }
+      }
+
+      if(last === 0) {
+
+          modified[i]['top'] = 'curve';
+          modified[i]['bottom'] = 'curve';
+          last = x.sender_id;
+
+        } else {
+
+          const t = i-1;
+
+          if(last === x.sender_id) {
+
+            if(modified[t].new_conversation === true) {
+
+
+              modified[t]['top'] = 'curve';
+              modified[i]['bottom'] = 'curve';
+
+            } else {
+
+              modified[t]['top'] = 'narrow';
+              modified[i]['bottom'] = 'narrow';
+            }
+          
+          } else {
+
+            modified[t]['top'] = 'curve';
+            modified[i]['bottom'] = 'curve';
+
+            last = x.sender_id;
+          } 
+      }
+
+      if(i === modified.length-1) {
+        modified[i]['top'] = 'curve';
       }
 
       return x;
     });
 
-    return [...modified].reverse();
+
+    return [...modified].reverse() as any;
+  }
+
+
+  getDate = (sentAt: string) => {
+    const current = new Date();
+    const stamp = new Date(sentAt);
+    const daysInWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthsInYears = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const time = `${stamp.getHours() === 0 ? '12': stamp.getHours() > 12 ? stamp.getHours() % 12 : stamp.getHours()}:${stamp.getMinutes() < 10 ? `0${stamp.getMinutes()}` : stamp.getMinutes() } ${stamp.getHours() > 12 ? 'PM': 'AM'}`;
+
+    if(stamp.getDate() === current.getDate() && stamp.getMonth() === current.getMonth() && stamp.getFullYear() === current.getFullYear()) 
+      return time;
+    if(stamp.getDate() === current.getDate()-1 && stamp.getMonth() === current.getMonth() && stamp.getFullYear() === current.getFullYear()) 
+      return `Yesturday ${time}`;
+    if(stamp.getTime() < (current.getTime() - 2 * 24 * 60 * 60 * 1000) && stamp.getTime() > (current.getTime() - 7 * 24 * 60 * 60 * 1000) && stamp.getMonth() === current.getMonth() && stamp.getFullYear() === current.getFullYear())
+      return `${daysInWeek[stamp.getDay()]} ${time}`;
+    if(stamp.getMonth() !== current.getMonth() && stamp.getFullYear() === stamp.getFullYear())
+      return `${monthsInYears[stamp.getMonth()]} ${stamp.getDate()}, ${time}`;
+    if(stamp.getFullYear() !== current.getFullYear())
+      return `${monthsInYears[stamp.getMonth()]} ${stamp.getDate()}, ${stamp.getFullYear()}, ${time}`;
+    return '';
   }
 
   
   eventType = () => {
-    this.newMessage === '' ? this.socket.blankMessage() : this.socket.typingMessage();
+    if(!this.isUserTyping && this.newMessage !== '') {
+      this.isUserTyping = true;
+      this.socket.typingMessage();
+    } 
+
+    if(this.isUserTyping && this.newMessage === '') {
+      this.isUserTyping = false;
+      this.socket.blankMessage();
+    }
   }
 
 
@@ -141,7 +238,7 @@ export class ConversationComponent implements AfterViewInit {
       const UUID = uuidv4();
 
       const userId = this.chat[0].chatmate_id !== this.chat[0].sender_id ? this.chat[0].sender_id : this.chat[0].receiver_id;
-      this.chat.unshift({ uuid: UUID, content: this.newMessage, status: 'sending', sender_id: userId, receiver_id: this.socket.chatmateId });
+      this.chat.unshift({ uuid: UUID, content: this.newMessage, status: 'sending', content_status: 'sending', sender_id: userId, receiver_id: this.socket.chatmateId });
 
       this.api.sendMessage(this.socket.chatmateId, this.newMessage, UUID).subscribe(res => {
         if(isFinite(res)) {
@@ -156,6 +253,7 @@ export class ConversationComponent implements AfterViewInit {
       }); 
       this.newMessage = '';
       this.socket.blankMessage();
+      this.isUserTyping = false;
     }
   }
 
@@ -205,7 +303,6 @@ export class ConversationComponent implements AfterViewInit {
     return this.chatService.getLatestTime(category);
   }
 
-  // New function to handle when a user clicks a message
   selectMessage(message: { sender: string; message: string; time: string; type: 'sent' | 'received'; priority?: boolean; status?: 'open' | 'pending' | 'closed'; ipLocation: string }) {
     console.log('selectMessage');
     this.selectedChat = message;
