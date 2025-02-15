@@ -134,7 +134,7 @@
 
         <section *ngFor="let message of renderMessages()">
 
-          <section *ngIf="message.new_conversation" class="pt-6 pb-5 flex items-center justify-center relative select-none">
+          <section *ngIf="message.new_conversation" class="pt-4 pb-2 flex items-center justify-center relative select-none">
             <hr class="w-[90%] border-gray-300">
             <span class="absolute pl-10 pr-10 bg-white text-xs text-gray-500">{{getDate(message.sent_at)}}</span>
           </section>
