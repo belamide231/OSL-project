@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, static as static_ } from "express";
 import path from 'path';
 
 import { isAuthenticated } from "../guards/isAuthenticated";
@@ -9,20 +9,17 @@ import { isAuthorized } from "../guards/isAuthorized";
 
 export const pageController = Router();
 pageController
+.use(static_(path.join(__dirname, '../../public/pages/browser')));
 
-.get('/login', hasToken, (req: Request, res: Response): void => {
-    if(req.cookies['unauthorized'])
-        return res.clearCookie('unauthorized').status(401).sendFile(path.join(__dirname, '../../public/browser/index.html'));
 
-    return res.sendFile(path.join(__dirname, '../../public/browser/index.html'));
-})
-
+pageController
 .get('/invite', isInvited)
-
-.get('/sign-up', isSignupValid, (_: Request, res: Response): any => {    
-    return res.status(200).sendFile(path.join(__dirname, '../../pages/signup.html'));
+.get('/widget', (req: Request, res: Response) => {
+    return res.sendFile(path.join(__dirname, '../../index.html'));
 })
-
-pageController.get(['/', '/chat', '/users', '/notification', '/settings', '/profile'], isAuthenticated, isAuthorized('admin'), (req: Request, res: Response): any => {
-    return res.status(200).sendFile(path.join(__dirname, '../../public/browser/index.html'));
+.get('/login', hasToken, (req: Request, res: Response): void => {
+    return req.cookies['unauthorized'] ? res.clearCookie('unauthorized').status(401).sendFile(path.join(__dirname, '../../public/pages/browser/index.html')) : res.sendFile(path.join(__dirname, '../../public/pages/browser/index.html'));
+})
+.get(['/', '/chat', '/users', '/notification', '/settings', '/profile'], isAuthenticated, isAuthorized('admin'), (req: Request, res: Response): any => {
+    return res.status(200).sendFile(path.join(__dirname, '../../public/pages/browser/index.html'));
 });

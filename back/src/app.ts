@@ -23,6 +23,7 @@ import { messageController } from './controllers/messageController';
 import { accountController } from './controllers/accountController';
 import { pageController } from './controllers/pageController';
 import { companyController } from './controllers/companyController';
+import { widgetController } from './controllers/widgetController';
 
 export const tmp = path.join(__dirname, '../tmp');
 export const level = getLevelConnection();
@@ -93,8 +94,8 @@ app
 .use(messageController)
 .use(accountController)
 .use(companyController)
-.use(express.static(path.join(__dirname, '../public/browser')));
-  
+.use(widgetController)
+
 refresher();
 io.on('connection', connection);
 

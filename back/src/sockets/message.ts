@@ -1,5 +1,5 @@
 import { io, socketClients } from "../app";
-import { socketUser } from "../interface/socketUser";
+import { socketUser } from "../interfaces/socketUser";
 import { deliveredChatService, seenChatService } from "../services/messageServices";
 
 

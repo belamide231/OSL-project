@@ -5,7 +5,7 @@ import { cookiesParser } from "../utilities/cookieParser";
 import { io } from "../app";
 import { verifyAccessToken } from "../utilities/jwt";
 import { blankMessage, messageDelivered, seenChat, typingMessage } from "./message";
-import { socketUser } from "../interface/socketUser";
+import { socketUser } from "../interfaces/socketUser";
 
 export const connection = async (socket: Socket): Promise<any> => {
     const cookies = socket.request.headers.cookie;

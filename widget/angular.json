@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "frontend": {
+    "widget": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "../back/public/pages",
+            "outputPath": "../back/public/widget",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -23,15 +23,13 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public",
-                "output": "assets"
-              },
-              "src/assets"
+                "input": "public"
+              }
             ],
             "styles": [
               "src/styles.css"
             ],
-            "scripts": ["src/assets/chat-widget-loader.js"]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -47,14 +45,10 @@
                   "maximumError": "4kB"
                 }
               ],
-              "outputHashing": "none"
+              "outputHashing": "all"
             },
             "development": {
-              "optimization": {
-  "scripts": true,
-  "styles": true,
-  "fonts": true
-},
+              "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
             }
@@ -65,10 +59,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "frontend:build:production"
+              "buildTarget": "widget:build:production"
             },
             "development": {
-              "buildTarget": "frontend:build:development"
+              "buildTarget": "widget:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -88,45 +82,12 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },"src/assets"
+              }
             ],
             "styles": [
               "src/styles.css"
             ],
-            "scripts": ["src/assets/chat-widget.loader.js"]
-          }
-        }
-      }
-    },
-    "chat-widget": {
-      "projectType": "library",
-      "root": "projects/chat-widget",
-      "sourceRoot": "projects/chat-widget/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:ng-package",
-          "options": {
-            "project": "projects/chat-widget/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/chat-widget/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/chat-widget/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "tsConfig": "projects/chat-widget/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "scripts": []
           }
         }
       }
